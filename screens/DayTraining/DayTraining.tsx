@@ -6,33 +6,40 @@ import { FlatList } from 'react-native-gesture-handler';
 import { collection, onSnapshot } from 'firebase/firestore';
 import { db } from '../../auth/firebase';
 import { useAuth } from '../../auth/UserContext';
-import TrainingCard from '../../components/TrainingCard/TrainingCard';
 //styles
 import { styles } from './DayTraining.styles';
+//compo
+import TrainingCard from '../../components/TrainingCard/TrainingCard';
+import Loader from '../../components/Loader';
+//utils
+import { getDayy } from '../../utils/date';
 
 const DayTraining = () => {
     const { user } = useAuth()
-    const [dataUser, setDataUser] = useState<any>()
+    const [trainings, setTrainings] = useState<any>()
+    const date = getDayy()
 
     useEffect(() => {
         const collectionRefCafes = collection(db, `users/${user}/trainings`)
         const unsubscribed = onSnapshot( collectionRefCafes , (snapshot) => {
-            setDataUser(snapshot.docs.map((doc) => ({...doc.data(), id: doc.id})))
+            setTrainings(
+                snapshot.docs
+                .map((doc) => ({...doc.data(), id: doc.id}))
+                .filter((t: any) => t.date.includes(date))
+            )
         } )
 
         return () => unsubscribed()
     }, [])
 
-    useEffect(() => {
-        console.log(dataUser)
-    },[dataUser])
 
-    if(!dataUser) return <View><Text>Loading...</Text></View>
+
+    if(!trainings) return <Loader />
 
     return (
         <View style={styles.wrapper}>
             <FlatList 
-                data={dataUser}
+                data={trainings}
                 renderItem={({ item }) => <TrainingCard trainingData={item} />}
                 keyExtractor={(item) => item.id}
                 showsVerticalScrollIndicator={false} //showsHorizontalScrollIndicator={false}
