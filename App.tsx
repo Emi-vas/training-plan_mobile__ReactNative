@@ -7,53 +7,64 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
 //compo
 import DayTraining from './screens/DayTraining/DayTraining';
 import AllTraining from './screens/AllTraining/AllTraining';
+//icons
+import { AntDesign } from '@expo/vector-icons';
+import { Entypo } from '@expo/vector-icons';
+import SignIn from './screens/Auth/SignIn';
+import UserContextCompo, { useAuth } from './auth/UserContext';
 
 const tab = createBottomTabNavigator()
 
 export default function App() {
+    return (
+      <UserContextCompo>
+        <Main />
+      </UserContextCompo>
+    )
+}
 
+
+const Main = () => {
+  const {user} = useAuth()
+
+  if(!user) return <SignIn />
 
   return (
     <NavigationContainer>
+      <StatusBar />
       <tab.Navigator
                 screenOptions={({route}) => ({
                     tabBarIcon: ({focused, color, size}) => { // les icones
                       let iconName;
                 
-                      if (route.name == "DayTraining") {
-                        return <View><Text>DayTrainin</Text></View>
-                      } else if (route.name == "AllTraining") {
-                        return <View><Text>AllTrainin</Text></View>
+                      if (route.name == "Entrainements du jour") {
+                        return <Entypo name="clock" size={24} color={focused ? "orange" : "white"} />
+                      } else if (route.name == "Tous les entrainements") {
+                        return <AntDesign name="bars" size={33} color={focused ? "orange" : "white"} />
                       }
                     },
-                    tabBarActiveTintColor: 'white', //text
-                    tabBarInactiveTintColor: 'gray',
+                    tabBarActiveTintColor: 'orange', //text
+                    tabBarInactiveTintColor: 'white',
+                    tabBarLabelStyle: {
+                      fontSize: 13
+                    },
                     
                     tabBarStyle: { // style additionnel
-                        height : 50,
-                        paddingVertical: 5,
+                        height : 90,
+                        paddingVertical: 7,
                         backgroundColor: "black",
                         position: 'absolute',
                         borderTopWidth: 0,
-                        paddingBottom: 5
+                        paddingBottom:30
                     },
 
-                    headerShown: false //show or not header
+                    headerShown: true //show or not header
                 })}
            
            >
-              <tab.Screen name="DayTraining" component={DayTraining} />
-              <tab.Screen name="AllTraining" component={AllTraining} />
+              <tab.Screen name="Entrainements du jour" component={DayTraining}/>
+              <tab.Screen name="Tous les entrainements" component={AllTraining} />
            </tab.Navigator>
     </NavigationContainer>
   )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
