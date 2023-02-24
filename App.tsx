@@ -1,6 +1,7 @@
 //react
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
+import { useEffect, useState } from 'react';
 //navigation
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
@@ -10,8 +11,11 @@ import AllTraining from './screens/AllTraining/AllTraining';
 //icons
 import { AntDesign } from '@expo/vector-icons';
 import { Entypo } from '@expo/vector-icons';
+//firebase
 import SignIn from './screens/Auth/SignIn';
 import UserContextCompo, { useAuth } from './auth/UserContext';
+import { collection, onSnapshot } from 'firebase/firestore';
+import { db } from './auth/firebase';
 
 const tab = createBottomTabNavigator()
 
@@ -25,12 +29,18 @@ export default function App() {
 
 
 const Main = () => {
-  const {user} = useAuth()
+  const {user, logOut} = useAuth()
+
+  //logOut()
 
   if(!user) return <SignIn />
 
-  return (
-    <NavigationContainer>
+  return <MainLogged />
+}
+
+const MainLogged = () => {
+    return (
+      <NavigationContainer>
       <StatusBar />
       <tab.Navigator
                 screenOptions={({route}) => ({
@@ -57,7 +67,7 @@ const Main = () => {
                         borderTopWidth: 0,
                         paddingBottom:30
                     },
-
+    
                     headerShown: true //show or not header
                 })}
            
@@ -65,6 +75,6 @@ const Main = () => {
               <tab.Screen name="Entrainements du jour" component={DayTraining}/>
               <tab.Screen name="Tous les entrainements" component={AllTraining} />
            </tab.Navigator>
-    </NavigationContainer>
-  )
+      </NavigationContainer>
+    )
 }
